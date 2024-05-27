@@ -56,18 +56,17 @@ export const updateVideo = (request: Request<any, any, VideoUpdateEntity>, respo
       ...body
     }
     db.videos[videoByIdIndex] = updatedEntity; 
-    response.status(200).json(updatedEntity);
+    response.status(204).json(updatedEntity);
   }
   response.status(404).send('Video not found');
 }
 
 export const removeVideo = (request: Request, response: Response) => {
   const { params: { id } } = request;
-
-  const videoByIdIndex = db.videos.findIndex((currentVideo) =>  currentVideo.id === Number(id));
+  const videoByIdIndex = db.videos.findIndex((currentVideo) => currentVideo.id === Number(id));
   if (videoByIdIndex > -1) {
     db.videos.splice(videoByIdIndex, 1);
-    response.status(204);
+    response.status(204).send();
   }
-  response.status(404);
+  response.status(404).send();
 }

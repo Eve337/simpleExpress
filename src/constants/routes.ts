@@ -9,6 +9,6 @@ export enum RouteUrls {
 
 
 export const Endpoints = {
-  VIDEOS: RouteUrls.HOMETASK_ONE + RouteUrls.ROOT + RouteUrls.API + RouteUrls.VIDEOS,
-  TESTING: RouteUrls.HOMETASK_ONE + RouteUrls.ROOT + RouteUrls.API + RouteUrls.TESTING,
+  VIDEOS: RouteUrls.VIDEOS,
+  TESTING: RouteUrls.TESTING,
 }
