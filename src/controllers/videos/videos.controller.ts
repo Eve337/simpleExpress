@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { db } from "../../db/db";
 import { VideoCreatePayload, VideoEntity, VideoUpdateEntity } from "../../models/videos.model";
 import dayjs from "dayjs";
+import { checkIsValidPayload } from "../../utils/validator";
 
 export const getVideos = (request: Request, response: Response) => {
   response.status(200).json(db.videos);
@@ -14,6 +15,12 @@ export const createVideo = (request: Request<any, any, VideoCreatePayload>, resp
     author,
     availableResolutions,
   }} = request;
+
+  const errors = checkIsValidPayload({ title, author, availableResolutions }, false);
+  if (errors.errorsMessages.length) {
+    response.status(400).send(errors);
+    return;
+  }
 
   const creationDate = new Date().toISOString();
   const publicationDate = dayjs(creationDate).add(1, 'day').toISOString()
@@ -41,15 +48,28 @@ export const getVideoById = (request: Request, response: Response) => {
   if (videoById) {
     response.status(200);
     response.send(videoById).json();
+    return;
   }
 
   
   response.status(404).send('Video not found');
+  return;
 }
 
 export const updateVideo = (request: Request<any, any, VideoUpdateEntity>, response: Response) => {
   const { params: { id }, body } = request;
   const videoByIdIndex = db.videos.findIndex((currentVideo) =>  currentVideo.id === Number(id));
+  if (videoByIdIndex === -1) {
+    response.status(404).send('Video not found');
+    return;
+  }
+  const errors = checkIsValidPayload(body, true);
+  if (errors.errorsMessages.length) {
+    response.status(400).send(errors);
+    return;
+  }
+
+  
   if (videoByIdIndex > -1) {
     const updatedEntity = {
       ...db.videos[videoByIdIndex],
@@ -57,8 +77,9 @@ export const updateVideo = (request: Request<any, any, VideoUpdateEntity>, respo
     }
     db.videos[videoByIdIndex] = updatedEntity; 
     response.status(204).json(updatedEntity);
+    return;
   }
-  response.status(404).send('Video not found');
+  return;
 }
 
 export const removeVideo = (request: Request, response: Response) => {
@@ -69,4 +90,5 @@ export const removeVideo = (request: Request, response: Response) => {
     response.status(204).send();
   }
   response.status(404).send();
+  return;
 }
